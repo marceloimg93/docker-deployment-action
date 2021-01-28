@@ -18,11 +18,6 @@ if [ -z "$INPUT_REMOTE_DOCKER_HOST" ]; then
     exit 1
 fi
 
-if [ -z "$INPUT_SSH_PUBLIC_KEY" ]; then
-    echo "Input ssh_public_key is required!"
-    exit 1
-fi
-
 if [ -z "$INPUT_SSH_PRIVATE_KEY" ]; then
     echo "Input ssh_private_key is required!"
     exit 1
@@ -81,7 +76,7 @@ eval $(ssh-agent)
 ssh-add "$HOME/.ssh/id_rsa"
 
 echo "Add known hosts"
-printf '%s %s\n' "$SSH_HOST" "$INPUT_SSH_PUBLIC_KEY" > /etc/ssh/ssh_known_hosts
+ssh-keyscan -t ecdsa "$SSH_HOST" > /etc/ssh/ssh_known_hosts
 
 if ! [ -z "$INPUT_DOCKER_PRUNE" ] && [ $INPUT_DOCKER_PRUNE = 'true' ] ; then
   yes | docker --log-level debug --host "ssh://$INPUT_REMOTE_DOCKER_HOST:$INPUT_REMOTE_DOCKER_PORT" system prune -a 2>&1
